@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 
-// Validation function to check if field is not empty
 const validateField = (value) => value.trim() !== '';
 
 const DynamicForm = () => {
   const [formFields, setFormFields] = useState([{ name: '', email: '' }]);
   const [errors, setErrors] = useState([]);
+  const [loading, setLoading] = useState(false); // Loading state
+  const [successMessage, setSuccessMessage] = useState(''); // Success message
+  const [errorMessage, setErrorMessage] = useState(''); // Error message
 
   // Handle input change
   const handleChange = (index, event) => {
@@ -27,7 +29,7 @@ const DynamicForm = () => {
   };
 
   // Validate fields and submit form
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const newErrors = [];
 
@@ -44,10 +46,34 @@ const DynamicForm = () => {
 
     setErrors(newErrors);
 
-    // If no errors, you can submit the data
+    // Check if there are no errors
     const isValid = newErrors.every((err) => Object.keys(err).length === 0);
     if (isValid) {
-      console.log('Form Submitted:', formFields);
+      setLoading(true);
+      setErrorMessage('');
+      setSuccessMessage('');
+
+      try {
+        // Submit form data to mock API
+        const response = await fetch('https://mockapi.io/endpoint/form', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ formFields }),
+        });
+
+        if (response.ok) {
+          setSuccessMessage('Form submitted successfully!');
+          setFormFields([{ name: '', email: '' }]); // Reset the form
+        } else {
+          throw new Error('Failed to submit form');
+        }
+      } catch (error) {
+        setErrorMessage(error.message);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -89,9 +115,12 @@ const DynamicForm = () => {
         Add Field
       </button>
 
-      <button type="submit" className="submit-btn">
-        Submit
+      <button type="submit" className="submit-btn" disabled={loading}>
+        {loading ? 'Submitting...' : 'Submit'}
       </button>
+
+      {successMessage && <div className="success-message">{successMessage}</div>}
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
 
       <style>{`
         .container {
@@ -139,6 +168,14 @@ const DynamicForm = () => {
         }
         .submit-btn {
           align-self: flex-end;
+        }
+        .success-message {
+          color: green;
+          margin-top: 10px;
+        }
+        .error-message {
+          color: red;
+          margin-top: 10px;
         }
         @media (max-width: 600px) {
           .field-group {
