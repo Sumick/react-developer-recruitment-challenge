@@ -1,0 +1,3 @@
+## React Developer Recruitment Challenge
+
+Welcome to the React Developer Recruitment Challenge! In this project, you'll demonstrate your skills in React by completing two interconnected tasks. These tasks are designed to assess your ability to create dynamic and responsive web applications. A repository will be generated for this project, where you can implement your solutions. Let's get started and show us what you've got!
